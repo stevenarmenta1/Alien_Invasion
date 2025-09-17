@@ -21,12 +21,12 @@ class Settings:
 
         #alien settings
         self.alien_speed = 1.0
-        self.fleet_drop_speed = 50
+        self.fleet_drop_speed = 10
         # fleet_direction of 1 represents right, -1 represents left. 
         # self.fleet_direction = 1
         
         # How quickly the game speeds up
-        self.speedup_scale = 1.5
+        self.speedup_scale = 1.2
 
         # How quickly the alien point values increase. 
         self.score_scale = 1.5

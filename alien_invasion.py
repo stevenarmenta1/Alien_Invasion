@@ -1,5 +1,7 @@
 import sys
 from time import sleep
+import json
+from pathlib import Path
 
 import pygame 
 
@@ -7,6 +9,7 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+import sound_effects as se   
 from game_stats import GamStats
 from scoreboard import Scoreboard
 from button import Button
@@ -57,7 +60,7 @@ class AlienInvasion:
         ''' Respond to keypresses and mouse events.'''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self._close_game()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
@@ -97,7 +100,7 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
-            sys.exit()
+            self._close_game()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
@@ -114,6 +117,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullet_allowd:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            se.bullet_sound.play() 
     
 
     def _update_bullets(self):
@@ -138,6 +142,8 @@ class AlienInvasion:
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
             self.sb.check_high_score()
+            se.alien_sound.play()
+            
         if not self.aliens:
             # Destroy existing bullets and create new fleet. 
             self.bullets.empty()
@@ -254,6 +260,17 @@ class AlienInvasion:
 
         pygame.display.flip()
 
+    def _close_game(self):
+        '''Save high score and exit.'''
+        saved_high_score = self.stats.get_saved_high_score()
+        if self.stats.high_score > saved_high_score:
+            path = Path('high_score.json')
+            contents = json.dumps(self.stats.high_score)
+            path.write_text(contents)
+        
+        sys.exit()
+
+        
 if __name__ == '__main__':
     ai = AlienInvasion()
     ai.run__game()
